@@ -58,23 +58,6 @@ func newServerCommandFlagsFor(app *BertApp) []cli.Flag {
 			Usage:       "Specifies the model name.",
 			Destination: &app.model,
 		},
-		&cli.StringFlag{
-			Name:        "tls-cert-file",
-			Usage:       "Specifies the path of the TLS certificate file.",
-			Value:       "/etc/ssl/certs/spago/server.crt",
-			Destination: &app.tlsCert,
-		},
-		&cli.StringFlag{
-			Name:        "tls-key-file",
-			Usage:       "Specifies the path of the private key for the certificate.",
-			Value:       "/etc/ssl/certs/spago/server.key",
-			Destination: &app.tlsKey,
-		},
-		&cli.BoolFlag{
-			Name:        "tls-disable ",
-			Usage:       "Specifies that TLS is disabled.",
-			Destination: &app.tlsDisable,
-		},
 		&cli.IntFlag{
 			Name:        "timeout",
 			Usage:       "Server read, write, and idle timeout duration in seconds.",
@@ -130,27 +113,13 @@ func newServerCommandActionFor(app *BertApp) func(c *cli.Context) error {
 		defer model.Close()
 		fmt.Printf("Config: %+v\n", model.Config)
 
-		if !app.tlsDisable {
-			fmt.Printf("TLS Cert path is %s\n", app.tlsCert)
-			fmt.Printf("TLS private key path is %s\n", app.tlsKey)
-		}
-		fmt.Printf("Start %s HTTP server listening on %s.\n", func() string {
-			if app.tlsDisable {
-				return "non-TLS"
-			}
-			return "TLS"
-		}(), app.address)
-		fmt.Printf("Start %s gRPC server listening on %s.\n", func() string {
-			if app.tlsDisable {
-				return "non-TLS"
-			}
-			return "TLS"
-		}(), app.grpcAddress)
+		fmt.Printf("Start HTTP server listening on %s.\n", app.address)
+		fmt.Printf("Start gRPC server listening on %s.\n", app.grpcAddress)
 
 		server := bert.NewServer(model)
 		server.TimeoutSeconds = app.serverTimeoutSeconds
 		server.MaxRequestBytes = app.serverMaxRequestBytes
-		server.StartDefaultServer(app.address, app.grpcAddress, app.tlsCert, app.tlsKey, app.tlsDisable)
+		server.StartDefaultServer(app.address, app.grpcAddress)
 
 		return nil
 	}

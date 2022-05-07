@@ -64,7 +64,7 @@ Start non-TLS server listening on 0.0.0.0:1987.
 At the first execution, the program downloads the required model, if available. For successive executions, it uses the
 previously downloaded model.
 
-The Docker version of the demo can be run like this. (Note that TLS is not disabled this time.)
+The Docker version of the demo can be run like this. 
 
 ```console
 docker run --rm -it -p:1987:1987 -v ~/.spago:/tmp/spago spago:main ner-server server --repo=/tmp/spago --model=goflair-en-ner-fast-conll03-v0.4

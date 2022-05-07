@@ -17,9 +17,6 @@ type BertApp struct {
 	*cli.App
 	address               string
 	grpcAddress           string
-	tlsCert               string
-	tlsKey                string
-	tlsDisable            bool
 	output                string
 	model                 string
 	repo                  string

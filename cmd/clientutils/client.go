@@ -5,7 +5,6 @@
 package clientutils
 
 import (
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -13,23 +12,17 @@ import (
 
 	"github.com/urfave/cli/v2"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 	"gopkg.in/yaml.v3"
 )
 
 // Flags returns a list of the common CLI flags for gRPC clients
 // combined with a list of specific CLI command flags.
-func Flags(address *string, tlsDisable *bool, output *string, cmdFlags []cli.Flag) []cli.Flag {
+func Flags(address *string, output *string, cmdFlags []cli.Flag) []cli.Flag {
 	grpcClientFlags := []cli.Flag{
 		&cli.StringFlag{
 			Name:        "address",
 			Value:       "127.0.0.1:1976",
 			Destination: address,
-		},
-		&cli.BoolFlag{
-			Name:        "tls-disable ",
-			Usage:       "Specifies that TLS is disabled.",
-			Destination: tlsDisable,
 		},
 		&cli.StringFlag{
 			Name:        "o, output",
@@ -68,19 +61,8 @@ func Println(format string, resp interface{}) {
 
 // OpenConnection returns a new grpc.ClientConn object. It blocks until
 // a connection is made or the process timed out.
-func OpenConnection(address string, tlsDisable bool) *grpc.ClientConn {
-	if tlsDisable {
-		conn, err := grpc.Dial(address, grpc.WithInsecure())
-		if err != nil {
-			log.Fatalln(err)
-		}
-		return conn
-	}
-
-	creds := credentials.NewTLS(&tls.Config{
-		InsecureSkipVerify: true,
-	})
-	conn, err := grpc.Dial(address, grpc.WithTransportCredentials(creds))
+func OpenConnection(address string) *grpc.ClientConn {
+	conn, err := grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalln(err)
 	}

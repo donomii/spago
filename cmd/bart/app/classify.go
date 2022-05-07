@@ -24,7 +24,7 @@ func newClientClassifyCommandFor(app *BartApp) *cli.Command {
 }
 
 func newClientClassifyCommandFlagsFor(app *BartApp) []cli.Flag {
-	return clientutils.Flags(&app.grpcAddress, &app.tlsDisable, &app.output, []cli.Flag{
+	return clientutils.Flags(&app.grpcAddress, &app.output, []cli.Flag{
 		&cli.StringFlag{
 			Name:        "text",
 			Destination: &app.requestText,
@@ -42,7 +42,7 @@ func newClientClassifyCommandActionFor(app *BartApp) func(c *cli.Context) error 
 	return func(c *cli.Context) error {
 		clientutils.VerifyFlags(app.output)
 
-		conn := clientutils.OpenConnection(app.grpcAddress, app.tlsDisable)
+		conn := clientutils.OpenConnection(app.grpcAddress)
 		client := grpcapi.NewBARTClient(conn)
 
 		resp, err := client.Classify(context.Background(), &grpcapi.ClassifyRequest{

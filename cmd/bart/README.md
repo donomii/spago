@@ -45,7 +45,7 @@ Let's test an Italian to English translation.
 Example:
 
 ```console
-./bart-server server --repo=~/.spago --model=Helsinki-NLP/opus-mt-it-en --tls-disable
+./bart-server server --repo=~/.spago --model=Helsinki-NLP/opus-mt-it-en
 ```
 
 It should print:

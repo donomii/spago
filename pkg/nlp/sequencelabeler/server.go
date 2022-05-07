@@ -32,24 +32,18 @@ func NewServer(model *Model) *Server {
 }
 
 // Start starts the HTTP and gRPC servers.
-func (s *Server) Start(address, grpcAddress, tlsCert, tlsKey string, tlsDisable bool) {
+func (s *Server) Start(address, grpcAddress string) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/ner-ui", ner.Handler)
 	mux.HandleFunc("/analyze", s.analyze)
 
 	go httputils.RunHTTPServer(httputils.HTTPServerConfig{
 		Address:         address,
-		TLSDisable:      tlsDisable,
-		TLSCert:         tlsCert,
-		TLSKey:          tlsKey,
 		TimeoutSeconds:  s.TimeoutSeconds,
 		MaxRequestBytes: s.MaxRequestBytes,
 	}, mux)
 
 	grpcServer := grpcutils.NewGRPCServer(grpcutils.GRPCServerConfig{
-		TLSDisable:      tlsDisable,
-		TLSCert:         tlsCert,
-		TLSKey:          tlsKey,
 		TimeoutSeconds:  s.TimeoutSeconds,
 		MaxRequestBytes: s.MaxRequestBytes,
 	})

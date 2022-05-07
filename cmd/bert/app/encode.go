@@ -24,7 +24,7 @@ func newClientEncodeCommandFor(app *BertApp) *cli.Command {
 }
 
 func newClientEncodeCommandFlagsFor(app *BertApp) []cli.Flag {
-	return clientutils.Flags(&app.address, &app.tlsDisable, &app.output, []cli.Flag{
+	return clientutils.Flags(&app.address, &app.output, []cli.Flag{
 		&cli.StringFlag{
 			Name:        "text",
 			Destination: &app.requestText,
@@ -37,7 +37,7 @@ func newClientEncodeCommandActionFor(app *BertApp) func(c *cli.Context) error {
 	return func(c *cli.Context) error {
 		clientutils.VerifyFlags(app.output)
 
-		conn := clientutils.OpenConnection(app.address, app.tlsDisable)
+		conn := clientutils.OpenConnection(app.address)
 		client := grpcapi.NewBERTClient(conn)
 
 		resp, err := client.Encode(context.Background(), &grpcapi.EncodeRequest{

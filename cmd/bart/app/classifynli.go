@@ -23,7 +23,7 @@ func newClientClassifyNLICommandFor(app *BartApp) *cli.Command {
 }
 
 func newClientClassifyNLICommandFlagsFor(app *BartApp) []cli.Flag {
-	return clientutils.Flags(&app.grpcAddress, &app.tlsDisable, &app.output, []cli.Flag{
+	return clientutils.Flags(&app.grpcAddress, &app.output, []cli.Flag{
 		&cli.StringFlag{
 			Name:        "text",
 			Destination: &app.requestText,
@@ -52,7 +52,7 @@ func newClientClassifyNLICommandActionFor(app *BartApp) func(c *cli.Context) err
 	return func(c *cli.Context) error {
 		clientutils.VerifyFlags(app.output)
 
-		conn := clientutils.OpenConnection(app.grpcAddress, app.tlsDisable)
+		conn := clientutils.OpenConnection(app.grpcAddress)
 		client := grpcapi.NewBARTClient(conn)
 
 		resp, err := client.ClassifyNLI(context.Background(), &grpcapi.ClassifyNLIRequest{

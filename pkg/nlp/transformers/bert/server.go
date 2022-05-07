@@ -40,7 +40,7 @@ func NewServer(model *Model) *Server {
 // StartDefaultServer is used to start a basic BERT HTTP server.
 // If you want more control of the HTTP server you can run your own
 // HTTP router using the public handler functions
-func (s *Server) StartDefaultServer(address, grpcAddress, tlsCert, tlsKey string, tlsDisable bool) {
+func (s *Server) StartDefaultServer(address, grpcAddress string) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/bert-qa-ui", bertqa.Handler)
 	mux.HandleFunc("/bert-classify-ui", bertclassification.Handler)
@@ -52,18 +52,13 @@ func (s *Server) StartDefaultServer(address, grpcAddress, tlsCert, tlsKey string
 	mux.HandleFunc("/encode", s.SentenceEncoderHandler)
 
 	go httputils.RunHTTPServer(httputils.HTTPServerConfig{
-		Address:         address,
-		TLSDisable:      tlsDisable,
-		TLSCert:         tlsCert,
-		TLSKey:          tlsKey,
+		Address: address,
+
 		TimeoutSeconds:  s.TimeoutSeconds,
 		MaxRequestBytes: s.MaxRequestBytes,
 	}, mux)
 
 	grpcServer := grpcutils.NewGRPCServer(grpcutils.GRPCServerConfig{
-		TLSDisable:      tlsDisable,
-		TLSCert:         tlsCert,
-		TLSKey:          tlsKey,
 		TimeoutSeconds:  s.TimeoutSeconds,
 		MaxRequestBytes: s.MaxRequestBytes,
 	})

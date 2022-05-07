@@ -63,23 +63,6 @@ func newServerCommandFlagsFor(app *BartApp) []cli.Flag {
 			Usage:       "Specifies the model name.",
 			Destination: &app.model,
 		},
-		&cli.StringFlag{
-			Name:        "tls-cert-file",
-			Usage:       "Specifies the path of the TLS certificate file.",
-			Value:       "/etc/ssl/certs/spago/server.crt",
-			Destination: &app.tlsCert,
-		},
-		&cli.StringFlag{
-			Name:        "tls-key-file",
-			Usage:       "Specifies the path of the private key for the certificate.",
-			Value:       "/etc/ssl/certs/spago/server.key",
-			Destination: &app.tlsKey,
-		},
-		&cli.BoolFlag{
-			Name:        "tls-disable",
-			Usage:       "Specifies that TLS is disabled.",
-			Destination: &app.tlsDisable,
-		},
 		&cli.IntFlag{
 			Name:        "timeout",
 			Usage:       "Server read, write, and idle timeout duration in seconds.",
@@ -127,30 +110,15 @@ func newServerCommandActionFor(app *BartApp) func(c *cli.Context) error {
 			panic("bart: invalid model type")
 		}
 
-		if !app.tlsDisable {
-			fmt.Printf("TLS Cert path is %s\n", app.tlsCert)
-			fmt.Printf("TLS private key path is %s\n", app.tlsKey)
-		}
+		fmt.Printf("Start gRPC server listening on %s.\n", app.grpcAddress)
 
-		fmt.Printf("Start %s gRPC server listening on %s.\n", func() string {
-			if app.tlsDisable {
-				return "non-TLS"
-			}
-			return "TLS"
-		}(), app.grpcAddress)
-
-		fmt.Printf("Start %s HTTP server listening on %s.\n", func() string {
-			if app.tlsDisable {
-				return "non-TLS"
-			}
-			return "TLS"
-		}(), app.address)
+		fmt.Printf("Start HTTP server listening on %s.\n", app.address)
 
 		s := server.NewServer(model, bpeTokenizer, spTokenizer)
 		s.TimeoutSeconds = app.serverTimeoutSeconds
 		s.MaxRequestBytes = app.serverMaxRequestBytes
-		s.StartDefaultHTTPServer(app.address, app.tlsCert, app.tlsKey, app.tlsDisable)
-		s.StartDefaultServer(app.grpcAddress, app.tlsCert, app.tlsKey, app.tlsDisable)
+		s.StartDefaultHTTPServer(app.address)
+		s.StartDefaultServer(app.grpcAddress)
 
 		return nil
 	}

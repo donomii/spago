@@ -23,7 +23,7 @@ func newClientAnalyzeCommandFor(app *NERApp) *cli.Command {
 }
 
 func newClientAnalyzeCommandFlagsFor(app *NERApp) []cli.Flag {
-	return clientutils.Flags(&app.address, &app.tlsDisable, &app.output, []cli.Flag{
+	return clientutils.Flags(&app.address, &app.output, []cli.Flag{
 		&cli.StringFlag{
 			Name:        "text",
 			Destination: &app.text,
@@ -44,7 +44,7 @@ func newClientAnalyzeCommandActionFor(app *NERApp) func(c *cli.Context) error {
 	return func(c *cli.Context) error {
 		clientutils.VerifyFlags(app.output)
 
-		conn := clientutils.OpenConnection(app.address, app.tlsDisable)
+		conn := clientutils.OpenConnection(app.address)
 		client := grpcapi.NewSequenceLabelerClient(conn)
 
 		resp, err := client.Analyze(context.Background(), &grpcapi.AnalyzeRequest{

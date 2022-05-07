@@ -13,11 +13,9 @@ FROM golang:1.15.6-alpine3.12 as Builder
 
 # Some of the Go packages used by spaGo require gcc. OpenSSL is used
 # to generate a self-signed cert in order to test the Docker image.
-# The packages ca-certificates is needed in order to run the servers
-# using TLS.
+
 RUN set -eux; \
 	apk add --no-cache --virtual .build-deps \
-		ca-certificates \
 		gcc \
 		musl-dev \
 		openssl \
@@ -33,21 +31,6 @@ ADD . /build/
 WORKDIR /build
 RUN go mod download
 RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags="-extldflags=-static" -o docker-entrypoint docker-entrypoint.go
-
-# A self-signed certificate and private key is generated so that the
-# servers can easily support TLS without requiring the user to
-# generate their own certificates.
-RUN mkdir /etc/ssl/certs/spago \
-	&& openssl req \
-		-x509 \
-		-nodes \
-		-newkey rsa:2048 \
-		-keyout /etc/ssl/certs/spago/server.key \
-		-out /etc/ssl/certs/spago/server.crt \
-		-days 3650 \
-		-subj "/C=IT/ST=Piedmont/L=Torino/O=NLP Odyssey/OU=spaGo/emailAddress=matteogrella@gmail.com/CN=*" \
-	&& chmod +r /etc/ssl/certs/spago/server.key \
-	;
 
 
 # The definition of the runtime container now follows.

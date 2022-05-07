@@ -6,7 +6,6 @@ package grpcutils
 
 import (
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 	"log"
 	"net"
 	"time"
@@ -15,14 +14,11 @@ import (
 // GRPCServerConfig provides server configuration parameters for creating
 // a GRPC server (see NewGRPCServer).
 type GRPCServerConfig struct {
-	TLSDisable      bool
-	TLSCert         string
-	TLSKey          string
 	TimeoutSeconds  int
 	MaxRequestBytes int
 }
 
-// NewGRPCServer returns grpc.Server objects, optionally configured for TLS.
+// NewGRPCServer returns grpc.Server objects
 func NewGRPCServer(config GRPCServerConfig) *grpc.Server {
 	serverOptions := createServerOptions(config)
 	return grpc.NewServer(serverOptions...)
@@ -33,14 +29,6 @@ func createServerOptions(config GRPCServerConfig) []grpc.ServerOption {
 		grpc.MaxRecvMsgSize(config.MaxRequestBytes),
 		// ConnectionTimeout is EXPERIMENTAL and may be changed or removed in a later release.
 		grpc.ConnectionTimeout(time.Duration(config.TimeoutSeconds) * time.Second),
-	}
-
-	if !config.TLSDisable {
-		creds, err := credentials.NewServerTLSFromFile(config.TLSCert, config.TLSKey)
-		if err != nil {
-			log.Fatalf("failed to read TLS certs: %v\n", err)
-		}
-		options = append(options, grpc.Creds(creds))
 	}
 
 	return options

@@ -52,11 +52,8 @@ func NewServer(
 }
 
 // StartDefaultServer is used to start a basic BART gRPC server.
-func (s *Server) StartDefaultServer(grpcAddress, tlsCert, tlsKey string, tlsDisable bool) {
+func (s *Server) StartDefaultServer(grpcAddress string) {
 	grpcServer := grpcutils.NewGRPCServer(grpcutils.GRPCServerConfig{
-		TLSDisable:      tlsDisable,
-		TLSCert:         tlsCert,
-		TLSKey:          tlsKey,
 		TimeoutSeconds:  s.TimeoutSeconds,
 		MaxRequestBytes: s.MaxRequestBytes,
 	})
@@ -67,7 +64,7 @@ func (s *Server) StartDefaultServer(grpcAddress, tlsCert, tlsKey string, tlsDisa
 // StartDefaultHTTPServer is used to start a basic BERT HTTP server.
 // If you want more control of the HTTP server you can run your own
 // HTTP router using the public handler functions
-func (s *Server) StartDefaultHTTPServer(address, tlsCert, tlsKey string, tlsDisable bool) {
+func (s *Server) StartDefaultHTTPServer(address string) {
 	mux := http.NewServeMux()
 	switch s.model.(type) {
 	case *sequenceclassification.Model:
@@ -82,9 +79,6 @@ func (s *Server) StartDefaultHTTPServer(address, tlsCert, tlsKey string, tlsDisa
 
 	go httputils.RunHTTPServer(httputils.HTTPServerConfig{
 		Address:         address,
-		TLSDisable:      tlsDisable,
-		TLSCert:         tlsCert,
-		TLSKey:          tlsKey,
 		TimeoutSeconds:  s.TimeoutSeconds,
 		MaxRequestBytes: s.MaxRequestBytes,
 	}, mux)

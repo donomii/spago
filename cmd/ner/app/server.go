@@ -57,23 +57,6 @@ func newServerCommandFlagsFor(app *NERApp) []cli.Flag {
 			Destination: &app.modelName,
 			Required:    true,
 		},
-		&cli.StringFlag{
-			Name:        "tls-cert-file",
-			Usage:       "Specifies the path of the TLS certificate file.",
-			Value:       "/etc/ssl/certs/spago/server.crt",
-			Destination: &app.tlsCert,
-		},
-		&cli.StringFlag{
-			Name:        "tls-key-file",
-			Usage:       "Specifies the path of the private key for the certificate.",
-			Value:       "/etc/ssl/certs/spago/server.key",
-			Destination: &app.tlsKey,
-		},
-		&cli.BoolFlag{
-			Name:        "tls-disable",
-			Usage:       "Specifies that TLS is disabled.",
-			Destination: &app.tlsDisable,
-		},
 		&cli.IntFlag{
 			Name:        "timeout",
 			Usage:       "Server read, write, and idle timeout duration in seconds.",
@@ -91,9 +74,6 @@ func newServerCommandFlagsFor(app *NERApp) []cli.Flag {
 
 func newServerCommandActionFor(app *NERApp) func(c *cli.Context) error {
 	return func(c *cli.Context) error {
-		fmt.Printf("TLS Cert path is %s\n", app.tlsCert)
-		fmt.Printf("TLS private key path is %s\n", app.tlsKey)
-
 		modelsFolder := app.repo
 		if _, err := os.Stat(modelsFolder); os.IsNotExist(err) {
 			log.Fatal(err)
@@ -126,24 +106,14 @@ func newServerCommandActionFor(app *NERApp) func(c *cli.Context) error {
 		}
 		defer model.Close()
 
-		fmt.Printf("Start %s HTTP server listening on %s.\n", func() string {
-			if app.tlsDisable {
-				return "non-TLS"
-			}
-			return "TLS"
-		}(), app.address)
+		fmt.Printf("Start HTTP server listening on %s.\n", app.address)
 
-		fmt.Printf("Start %s gRPC server listening on %s.\n", func() string {
-			if app.tlsDisable {
-				return "non-TLS"
-			}
-			return "TLS"
-		}(), app.grpcAddress)
+		fmt.Printf("Start gRPC server listening on %s.\n", app.grpcAddress)
 
 		server := sequencelabeler.NewServer(model)
 		server.TimeoutSeconds = app.serverTimeoutSeconds
 		server.MaxRequestBytes = app.serverMaxRequestBytes
-		server.Start(app.address, app.grpcAddress, app.tlsCert, app.tlsKey, app.tlsDisable)
+		server.Start(app.address, app.grpcAddress)
 
 		return nil
 	}

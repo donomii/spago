@@ -22,15 +22,11 @@ const DefaultMaxRequestBytes = 1 << 20 // 1 MB
 // an HTTP server (see RunHTTPServer).
 type HTTPServerConfig struct {
 	Address         string
-	TLSDisable      bool
-	TLSCert         string
-	TLSKey          string
 	TimeoutSeconds  int
 	MaxRequestBytes int
 }
 
-// RunHTTPServer listens on the given address and serves the given mux using HTTP
-// (optionally over TLS), and blocks until done.
+// RunHTTPServer listens on the given address and serves the given mux using HTTP and blocks until done.
 func RunHTTPServer(config HTTPServerConfig, h http.Handler) {
 	timeout := time.Duration(config.TimeoutSeconds) * time.Second
 	server := &http.Server{
@@ -46,11 +42,7 @@ func RunHTTPServer(config HTTPServerConfig, h http.Handler) {
 	}
 
 	var err error
-	if config.TLSDisable {
-		err = server.ListenAndServe()
-	} else {
-		err = server.ListenAndServeTLS(config.TLSCert, config.TLSKey)
-	}
+	err = server.ListenAndServe()
 	log.Fatal(err)
 }
 

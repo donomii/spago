@@ -26,9 +26,6 @@ type NERApp struct {
 	*cli.App
 	address               string
 	grpcAddress           string
-	tlsCert               string
-	tlsKey                string
-	tlsDisable            bool
 	output                string
 	repo                  string
 	modelFolder           string

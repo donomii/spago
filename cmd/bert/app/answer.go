@@ -23,7 +23,7 @@ func newClientAnswerCommandFor(app *BertApp) *cli.Command {
 }
 
 func newClientAnswerCommandFlagsFor(app *BertApp) []cli.Flag {
-	return clientutils.Flags(&app.address, &app.tlsDisable, &app.output, []cli.Flag{
+	return clientutils.Flags(&app.address, &app.output, []cli.Flag{
 		&cli.StringFlag{
 			Name:        "passage",
 			Destination: &app.passage,
@@ -41,7 +41,7 @@ func newClientAnswerCommandActionFor(app *BertApp) func(c *cli.Context) error {
 	return func(c *cli.Context) error {
 		clientutils.VerifyFlags(app.output)
 
-		conn := clientutils.OpenConnection(app.address, app.tlsDisable)
+		conn := clientutils.OpenConnection(app.address)
 		client := grpcapi.NewBERTClient(conn)
 
 		resp, err := client.Answer(context.Background(), &grpcapi.AnswerRequest{
